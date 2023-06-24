@@ -1,5 +1,23 @@
 version: '3'
 services:
+  jupyter:
+    image: cerastesjl
+    container_name: cerastesjl-jupyter
+    volumes:
+      - ./:/workspace/Cerastes.jl
+    working_dir: /workspace/Cerastes.jl
+    ports:
+      - "8888:8888"
+    command: jupyter notebook --notebook-dir /workspace/Cerastes.jl --ip=0.0.0.0 --allow-root
+  lab:
+    image: cerastesjl
+    container_name: cerastesjl-lab
+    volumes:
+      - ./:/workspace/Cerastes.jl
+    working_dir: /workspace/Cerastes.jl
+    ports:
+      - "8888:8888"
+    command: jupyter lab --notebook-dir /workspace/Cerastes.jl --ip=0.0.0.0 --allow-root
   julia:
     image: cerastesjl
     container_name: cerastesjl-julia
@@ -7,15 +25,13 @@ services:
       - ./:/workspace/Cerastes.jl
     working_dir: /workspace/Cerastes.jl
     command: julia --project=/workspace/Cerastes.jl
-
   shell:
     image: cerastesjl
-    container_name: cerastesjl-julia
+    container_name: cerastesjl-shell
     volumes:
       - ./:/workspace/Cerastes.jl
     working_dir: /workspace/Cerastes.jl
     command: /bin/bash
-
   web:
     image: cerastesjl
     container_name: cerastesjl-packagedocs
@@ -25,3 +41,12 @@ services:
     ports:
       - "8000:8000"
     command: make web
+  pluto:
+    image: cerastesjl
+    container_name: cerastesjl-pluto
+    volumes:
+      - ./:/workspace/Cerastes.jl
+    working_dir: /workspace/Cerastes.jl
+    ports:
+      - "1234:1234"
+    command: julia -e 'import Pluto; Pluto.run(host="0.0.0.0", port=1234)'
