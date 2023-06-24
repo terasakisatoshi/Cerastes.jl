@@ -29,6 +29,7 @@ jobs:
     - name: generate Remark slideshow
       run: |
         cd slideshow
+        julia -e 'using Pkg; Pkg.instantiate();'
         julia -e 'using Remark; Remark.slideshow("."; options=Dict("ratio" => "16:9"), title="Presentation")'
     - name: copy to artifacts
       run: |
