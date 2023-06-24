@@ -56,6 +56,7 @@ RUN curl -kL https://bootstrap.pypa.io/get-pip.py | python3 && \
     nbconvert \
     ipykernel \
     git+https://github.com/IllumiDesk/jupyter-pluto-proxy.git \
+    jupyterlab_sublime \
     jupyterlab_code_formatter autopep8 isort black \
     webio_jupyter_extension \
     webio-jupyterlab-provider \

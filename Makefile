@@ -5,10 +5,11 @@ DOCKER_IMAGE=cerastesjl
 all: build
 
 build:
-	-rm -f Manifest.toml docs/Manifest.toml
+	-rm -f Manifest.toml docs/Manifest.toml 
+	-rm -rf ./.CondaPkg
 	docker build -t ${DOCKER_IMAGE} . --build-arg NB_UID=`id -u`
 	docker compose build
-	docker compose run --rm shell julia --project=@. -e 'using Pkg; Pkg.instantiate()'
+	docker compose run --rm shell julia --project=@. -e 'using Pkg; Pkg.instantiate(); using PythonCall'
 	docker compose run --rm shell julia --project=docs -e 'using Pkg; Pkg.develop(PackageSpec(path=pwd())); Pkg.instantiate()'
 
 # Excecute in docker container
@@ -27,5 +28,6 @@ clean:
 	-find $(CURDIR) -name "*.html" -type f -delete
 	-find $(CURDIR) -name "*.gif" -type f -delete
 	-find $(CURDIR) -name "*.ipynb_checkpoints" -type d -exec rm -rf "{}" +
-	-rm -f  Manifest.toml docs/Manifest.toml
+	-rm -f  Manifest.toml docs/Manifest.toml 
+	-rm -rf .CondaPkg
 	-rm -rf docs/build
