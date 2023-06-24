@@ -1,6 +1,6 @@
 class: middle, center
 
-# PythonCall.jl 周りの話
+# PythonCall.jl 周りのお話
 
 ```@example today
 using Dates # hide
@@ -472,5 +472,6 @@ Julia の `UnitRange` は Python の range に変換されるようである． 
 
 - Python ユーザーが Julia を使う時は juliacall が良さそう
    - PyCall.jl の双対概念の pyjulia に比べるとインストールトラブルが少なかった印象
+- ２箇所ほどコントリビューションチャンス見つけたよ 😇
 
 以上．
