@@ -19,8 +19,73 @@ println("更新日: $(Dates.now())") # hide
 
 ### 双対概念として
 
+- 適切な言い方かはわからないが Python から Julia を呼ぶ際の対応概念・技術をここでは双対概念と呼ぶことにする．
 - Python から Julia を呼びたい場合 `juliacall` を使える
 - `juliapkg` で Python 環境毎に Julia の環境を管理できる（らしい）
+
+---
+
+# Non-copying conversions について
+
+Python の処理を Julia から受け取る場合, PyCall.jl ではコピーが生じる.
+
+```julia
+using PyCall
+
+py"""
+import numpy as np
+x = np.array([1,2,3])
+def getx():
+    global x
+    return x
+"""
+
+pyx = py"getx"()
+@assert pyx[1] == 1
+
+pyx[1] = -999
+@assert py"getx"()[1] == 1
+```
+
+--
+
+回避策はある(下記のようにする)
+
+```julia
+jlx = pycall(py"getx", PyArray) # 戻り値の型を PyArray とする
+jlx[1] = -999
+@assert py"getx"()[1] == -999
+```
+
+---
+
+# Non-copying conversions
+
+PythonCall.jl の場合, NumPy の配列のような mutable オブジェクトのコピーを作らない. 戻り値は　Python のオブジェクトのように操作ができる.
+
+```python
+# mylib.py
+import numpy as np
+x = np.array([1,2,3])
+def getx():
+    global x
+    return x
+```
+
+```julia
+using PythonCall
+
+# https://github.com/cjdoris/PythonCall.jl/issues/70
+pyimport("sys").path.append(@__DIR__)
+
+mylib = pyimport("mylib")
+
+pyx = mylib.getx()
+pyx[0] = -999
+isequal = mylib.x[0] == -999
+isequal |> typeof == Py # これが仕様なのかわからないが，現時点ではこのようになる．
+@assert Bool(isequal)
+```
 
 ---
 
@@ -174,6 +239,15 @@ nothing #hide
 
 ---
 
+# 使うパッケージのバージョン
+
+```@example checkversion
+using Pkg
+Pkg.status()
+```
+
+---
+
 # Python 版
 
 ```python
@@ -219,6 +293,32 @@ for pysimplex in hull.simplices
 end
 
 fig.savefig("plot1.png")
+```
+
+---
+
+# Julia のデータを Python のオブジェクトに変換
+
+- `points = Py(rand(rng, 30, 2)).to_numpy()` のようにすると [NumPy のデータとして扱える](https://cjdoris.github.io/PythonCall.jl/stable/faq/#Issues-when-Numpy-arrays-are-expected)．添え字として `0` や `-1` が使える. ただし `points[:, 0]` のような構文は現時点では使えてない. `getindex` を呼ぶために `Colon()` の処理が適切になされていないため？
+- `points[pybuiltins.None, 0]` は Python ユーザにとって意図した挙動にならない
+- `points[pybuiltins.slice(pybuiltins.None), 0]` による解決策がある.
+- Pythonista にとっては最も親和性が高いが後もう少し
+
+```julia
+using Random
+using PythonCall
+using PythonPlot: pyplot as plt
+
+ConvexHull = PythonCall.pyimport("scipy.spatial").ConvexHull
+rng = Xoshiro(0)
+points = Py(rand(rng, 30, 2)).to_numpy()
+hull = ConvexHull(points)
+
+fig, ax = plt.subplots()
+ax.plot(points[pybuiltins.slice(pybuiltins.None), 0], points[pybuiltins.slice(pybuiltins.None), 1], "ro")
+for simplex in hull.simplices
+    ax.plot(points[simplex, 0], points[simplex, 1], "k-")
+end
 ```
 
 ---
@@ -286,6 +386,91 @@ julia> ConvexHull(rand(Xoshiro(0), 30, 2)).simplices |> collect
 
 ---
 
-# 現時点でわかってること
+class: middle, center
 
-機械的に Python と連携するバックエンド(PyCall.jl や PythonCall.jl のこと) を置き換えるのはヤバそう.
+# Python から Julia を呼びたい場合
+
+`juliacall`, `juliapkg`
+
+---
+
+# Python から Julia を呼ぶ
+
+機械学習の社会実装といった産業上での要請から Python, Web 開発 のライブラリ，エコシステム充実している．後発の Julia は次の懸念点を持たれてしまう:
+
+```
+- Python じゃだめなの？
+- エコシステムはどれぐらい充実してるの？
+- Python で書いた既存の資源は？
+- すでに動いているサービスがあるのだけれど？
+- これ以上新しいこと覚えてたくない
+- 仮にスクラッチで Julia で書いた場合，どのように使えばいいのか？
+```
+
+これらの懸念点にある心理的な不安の解消として Python から Julia を呼べる仕組みが PyCall.jl/PythonCall.jl のように気軽にできる仕組みが望まれる．
+
+- `juliacall` は PythonCall.jl の双対概念に対応する．
+- `juliapkg` は CondaPkg.jl の双対概念に対応する．
+
+---
+
+# 使い方
+
+- 詳しくは [Getting started](https://cjdoris.github.io/PythonCall.jl/stable/juliacall/#Getting-started) を参照のこと
+
+```console
+$ pip3 install juliacall
+$ python
+>>> import juliacall
+>>> jl = juliacall.Main
+>>> juliacall.Pkg.add("Example")
+>>> jl.seval("using Example")
+>>> jl.Example.hello("Azarashi")
+'Hello, Azarashi'
+```
+
+- `jl.<func>(<args>)` のような呼び出し方を使う. `seval` は便利だが呼び出しのオーバヘッドがあることに注意. 
+
+Python パッケージを書く開発者は Main モジュールに拡張機能を書かずに `newmodule` によって名前空間の汚染を避けることが推奨されているようだ．
+
+```python
+import juliacall
+jl = juliacall.newmodule("MyModule")
+```
+
+---
+
+# 興味深いこと
+
+```python
+import juliacall
+import numpy as np
+
+jl = juliacall.Main
+jl.Pkg.activate(jl.Base.current_project())
+jl.Pkg.instantiate()
+
+jl.seval("using Images")
+```
+
+```python
+H, W = 2 ** 4, 2 ** 4
+pyimg = np.array(range(0, 256)).astype(np.uint8).reshape(H, W).T
+
+jlimg = jl.reinterpret(jl.N0f8, jl.reshape(jl.seval("UInt8(0):UInt8(255) |> collect"), H, W))
+
+assert np.all(pyimg / 255 == jlimg)
+```
+
+Julia の `UnitRange` は Python の range に変換されるようである． `UInt8(255) + UInt8(1)` という変換を行なっているせいか `jl.UnitRange[jl.UInt8](jl.UInt8(0), jl.UInt8(255))` は `range(0, 0)` になる．．．辛い．
+
+---
+
+# まとめ
+
+- パッケージ開発者が機械的に Python と連携するバックエンド(PyCall.jl や PythonCall.jl のこと) を置き換えるべきかはもう少し議論が必要.
+
+- Python ユーザーが Julia を使う時は juliacall が良さそう
+   - PyCall.jl の双対概念の pyjulia に比べるとインストールトラブルが少なかった印象
+
+以上．
