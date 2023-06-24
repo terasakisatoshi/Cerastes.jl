@@ -5,6 +5,7 @@ version = "1.0.0-DEV"
 
 [deps]
 Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+OffsetArrays = "6fe1bfb0-de20-5000-8ca7-80f57d26f881"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"

@@ -1,18 +1,13 @@
 # %% [markdown]
-# 下記のコマンドをリポジトリのルート(即ち `Project.toml`, `README.md` が存在するディレクトリ) で実行する。
+# 凸包(Convex Hull)の計算
 #
-# ```console
-# $ PYTHON_JULIAPKG_PROJECT=`pwd` jupyter lab
-# ```
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.ConvexHull.html
 
 # %%
 from scipy.spatial import ConvexHull
 import juliapkg
 import juliacall
 import matplotlib.pyplot as plt
-
-# %%
-juliapkg.project()
 
 # %%
 jl = juliacall.Main
