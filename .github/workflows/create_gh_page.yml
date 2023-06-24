@@ -31,11 +31,11 @@ jobs:
       run: |
         cd slideshow
         julia -e 'using Pkg; Pkg.instantiate();'
+        julia -e 'using PythonCall; ENV["PYTHON"]=PythonCall.C.CTX.exe_path; using Pkg; Pkg.build("PyCall")'
         julia -e 'using Remark; Remark.slideshow("."; options=Dict("ratio" => "16:9"), title="Presentation")'
     - name: copy to artifacts
       run: |
         cp -r ./slideshow/build ./artifacts
-        cp playground/notebook/julia/*.html ./artifacts
         zip -r artifacts.zip artifacts
     - name: Deploy website
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
