@@ -18,7 +18,7 @@ jobs:
       JULIA_PROJECT: '@.'
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Julia
       uses: julia-actions/setup-julia@v1
       with:
@@ -34,7 +34,7 @@ jobs:
         zip -r artifacts.zip artifacts
     - name: Deploy website
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         BRANCH: gh-pages
