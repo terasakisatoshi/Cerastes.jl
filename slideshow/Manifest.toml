@@ -2,7 +2,7 @@
 
 julia_version = "1.9.1"
 manifest_format = "2.0"
-project_hash = "e875df5fecd68abc87543da15a685ce45be57a92"
+project_hash = "052f7f7c05a1b993ed7e726e9a5b7fdacd964efb"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -135,12 +135,6 @@ deps = ["Serialization", "Sockets"]
 git-tree-sha1 = "96d823b94ba8d187a6d8f0826e731195a74b90e9"
 uuid = "f0e56b4a-5159-44fe-b623-3e5288b988bb"
 version = "2.2.0"
-
-[[deps.Conda]]
-deps = ["Downloads", "JSON", "VersionParsing"]
-git-tree-sha1 = "915ebe6f0e7302693bdd8eac985797dba1d25662"
-uuid = "8f4d0f93-b110-5947-807f-2305c1781a2d"
-version = "1.9.0"
 
 [[deps.CondaPkg]]
 deps = ["JSON3", "Markdown", "MicroMamba", "Pidfile", "Pkg", "TOML"]
@@ -770,12 +764,6 @@ git-tree-sha1 = "d7a7aef8f8f2d537104f170139553b14dfe39fe9"
 uuid = "92933f4c-e287-5a05-a399-4b506db050ca"
 version = "1.7.2"
 
-[[deps.PyCall]]
-deps = ["Conda", "Dates", "Libdl", "LinearAlgebra", "MacroTools", "Serialization", "VersionParsing"]
-git-tree-sha1 = "f33ca06633c2cf08753d235208fcb46a052072ea"
-uuid = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
-version = "1.96.0"
-
 [[deps.PythonCall]]
 deps = ["CondaPkg", "Dates", "Libdl", "MacroTools", "Markdown", "Pkg", "REPL", "Requires", "Serialization", "Tables", "UnsafePointers"]
 git-tree-sha1 = "0d15cb32f52654921169b4305dae8f66a0e345dc"
@@ -861,12 +849,6 @@ version = "1.5.1"
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 version = "0.7.0"
-
-[[deps.SciPy]]
-deps = ["InteractiveUtils", "PyCall"]
-git-tree-sha1 = "b82bc3390c68975bc70e943f6cedf14e5050b7b5"
-uuid = "ebc72ef8-9537-4fb0-b64e-ac76025fed2d"
-version = "0.1.4"
 
 [[deps.Scratch]]
 deps = ["Dates"]

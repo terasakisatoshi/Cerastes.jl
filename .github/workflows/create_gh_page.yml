@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JULIA_PROJECT: '@.'
-      JULIA_PYTHONCALL_EXE: '@PyCall'
+      #JULIA_PYTHONCALL_EXE: '@PyCall'
     steps:
     - name: Checkout
       uses: actions/checkout@v2
@@ -24,14 +24,13 @@ jobs:
       uses: julia-actions/setup-julia@v1
       with:
         version: 1.9.1
-    - name: Install dependencies for Julia
-      run: |
-        julia -e 'using Pkg; Pkg.instantiate();'
+    #- name: Install dependencies for Julia
+    #  run: |
+    #    julia -e 'using Pkg; Pkg.instantiate();'
     - name: generate Remark slideshow
       run: |
         cd slideshow
         julia -e 'using Pkg; Pkg.instantiate();'
-        julia -e 'using PythonCall; ENV["PYTHON"]=PythonCall.C.CTX.exe_path; using Pkg; Pkg.build("PyCall")'
         julia -e 'using Remark; Remark.slideshow("."; options=Dict("ratio" => "16:9"), title="Presentation")'
     - name: copy to artifacts
       run: |
