@@ -1,0 +1,53 @@
+name: Push to ipynb-zoo branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - "notebooks/**"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      JULIA_PROJECT: '@.'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Julia
+      uses: julia-actions/setup-julia@v1
+      with:
+        version: 1.9.1
+    - name: Install dependencies for Julia
+      run: |
+        julia -e 'using Pkg; Pkg.instantiate();'
+    - name: generate Remark slideshow
+      run: |
+        cd slideshow
+        julia -e 'Remark.slideshow("."; options=Dict("ratio" => "16:9"), title="Presentation")'
+    - name: copy to artifacts
+      run: |
+        cp -r ./slideshow/build ./artifacts
+        cp playground/notebook/julia/*.html ./artifacts
+        zip -r artifacts.zip artifacts
+    - name: Deploy website
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: ./artifacts
+    - name: Push to tag named artifacts
+      uses: ncipollo/release-action@v1
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      with:
+        allowUpdates: true
+        omitBodyDuringUpdate: true
+        tag: artifacts/latest
+        artifacts: "./artifacts.zip"
+        token: ${{ secrets.GITHUB_TOKEN }}
