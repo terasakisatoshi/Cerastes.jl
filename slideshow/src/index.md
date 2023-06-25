@@ -7,6 +7,8 @@ using Dates # hide
 println("更新日: $(Dates.now())") # hide
 ```
 
+お勉強会資料はこちら https://github.com/terasakisatoshi/Cerastes.jl 
+
 ---
 
 # PythonCall.jl について 
