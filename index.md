@@ -10,8 +10,11 @@ class: middle, center
 
 
 ```
-更新日: 2023-06-24T15:16:59.078
+更新日: 2023-06-25T04:18:40.954
 ```
+
+
+お勉強会資料はこちら https://github.com/terasakisatoshi/Cerastes.jl 
 
 
 ---
